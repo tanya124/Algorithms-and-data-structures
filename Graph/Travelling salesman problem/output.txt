@@ -1,0 +1,143 @@
+﻿Results for N = 8
+
+***** Test 1 *****
+Value: 8
+Approximate answer: 77.0611
+Optimal answer: 74.247
+Approximation quality: 1.0379
+
+
+***** Test 2 *****
+Value: 8
+Approximate answer: 134.73
+Optimal answer: 121.807
+Approximation quality: 1.1061
+
+
+***** Test 3 *****
+Value: 8
+Approximate answer: 96.9277
+Optimal answer: 77.3988
+Approximation quality: 1.25231
+
+
+***** Test 4 *****
+Value: 8
+Approximate answer: 140.686
+Optimal answer: 123.278
+Approximation quality: 1.14121
+
+
+***** Test 5 *****
+Value: 8
+Approximate answer: 173.341
+Optimal answer: 152.169
+Approximation quality: 1.13914
+
+
+***** Test 6 *****
+Value: 8
+Approximate answer: 95.7515
+Optimal answer: 93.1402
+Approximation quality: 1.02804
+
+
+***** Test 7 *****
+Value: 8
+Approximate answer: 114.301
+Optimal answer: 104.718
+Approximation quality: 1.09152
+
+
+***** Test 8 *****
+Value: 8
+Approximate answer: 78.4123
+Optimal answer: 75.5376
+Approximation quality: 1.03806
+
+
+***** Test 9 *****
+Value: 8
+Approximate answer: 123.669
+Optimal answer: 97.5503
+Approximation quality: 1.26775
+
+
+***** Test 10 *****
+Value: 8
+Approximate answer: 68.2884
+Optimal answer: 59.6229
+Approximation quality: 1.14534
+
+********** Results tests **********
+Average quality of approximation: 1.12474
+Mean square departure: 0.00634868
+***********************************
+Results for N = {2,...,10}
+
+***** Test 1 *****
+Value: 2
+Approximate answer: 38.4708
+Optimal answer: 38.4708
+Approximation quality: 1
+
+
+***** Test 1 *****
+Value: 3
+Approximate answer: 68.5782
+Optimal answer: 68.5782
+Approximation quality: 1
+
+
+***** Test 1 *****
+Value: 4
+Approximate answer: 40.9541
+Optimal answer: 40.9541
+Approximation quality: 1
+
+
+***** Test 1 *****
+Value: 5
+Approximate answer: 44.1766
+Optimal answer: 42.0973
+Approximation quality: 1.04939
+
+
+***** Test 1 *****
+Value: 6
+Approximate answer: 73.0798
+Optimal answer: 66
+Approximation quality: 1.10727
+
+
+***** Test 1 *****
+Value: 7
+Approximate answer: 69.7506
+Optimal answer: 63.9463
+Approximation quality: 1.09077
+
+
+***** Test 1 *****
+Value: 8
+Approximate answer: 113.255
+Optimal answer: 102.53
+Approximation quality: 1.1046
+
+
+***** Test 1 *****
+Value: 9
+Approximate answer: 91.2089
+Optimal answer: 91.2089
+Approximation quality: 1
+
+
+***** Test 1 *****
+Value: 10
+Approximate answer: 84.0332
+Optimal answer: 75.3243
+Approximation quality: 1.11562
+
+********** Results tests **********
+Average quality of approximation: 1.05196
+Mean square departure: 0.00246608
+***********************************
