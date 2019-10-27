@@ -1,0 +1,189 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <memory>
+
+using std::cin;
+using std::cout;
+using std::vector;
+using std::string;
+using std::map;
+using std::move;
+using std::make_unique;
+using std::unique_ptr;
+
+//Разбиение шаблона на подшаблоны
+vector<string> ParsePattern(const string& PatternString, vector<int>& position){
+    vector<string> patterns;
+    string pattern;
+    for (size_t i = 0; i < PatternString.size(); ++i) {
+        if (PatternString[i] == '?') {
+            if (!pattern.empty()) {
+                patterns.push_back(pattern);
+                position.push_back(i - pattern.size());
+            }
+            pattern = "";
+        }
+        else {
+            pattern += PatternString[i];
+        }
+    }
+
+    if (!pattern.empty()) {
+        patterns.push_back(pattern);
+        position.push_back(PatternString.size() - pattern.size());
+    }
+
+    return patterns;
+}
+
+
+class Trie{
+public:
+    Trie(const string& PatternString){
+        _patterns = ParsePattern(PatternString, _position);
+        _trie.emplace_back(make_unique<Vertex>(-1, '#'));
+
+        for (size_t i = 0; i < _patterns.size(); i++) {
+            AddStr(_patterns[i], i);
+        }
+    }
+
+
+    void Search(const string& text, vector<unsigned short>& cout_of_patterns){
+        int current_vertex = 0;
+        for (int i = 0; i < text.length(); ++i) {
+            current_vertex = GetAutoMove(current_vertex, text[i]);
+            Check(current_vertex, i + 1, cout_of_patterns);
+        }
+    }
+
+    int GetCountPattern() const{
+        return _patterns.size();
+    }
+
+private:
+    struct Vertex {
+        map<char, int> next_vertx; //мэп сыновей
+        map<char, int> auto_move; //мэп переходов
+        bool flag = false; //true - если состояние терминальное
+        int suff_link = -1; //суффиксная ссылка
+        int good_suff_link = -1; //сжатая суффиксная ссылка
+        int father; //индекс родительской вершины
+        char symb; //символ, по которому пришли в вершину
+        vector<int> id_pattern; // индексы шаблонов, которым соответствует вершина
+        vector<int> terminals; //то же самое что и id_pattern, но запоняем во время поиска
+        Vertex(int father, char symb) : father(father), symb(symb) {}
+    };
+
+
+    vector<unique_ptr<Vertex>> _trie; //бор
+    vector<string> _patterns; //вектор подшаблонов шаблона
+    vector<int> _position; //позиции подшаблонов в шаблоне
+
+    void AddStr(const string& str, int strIndex){
+        int current_vertex = 0;
+        for (const auto c : str) {
+            int& next = _trie[current_vertex]->next_vertx[c];
+            if (next == 0) {
+                _trie.emplace_back(make_unique<Vertex>(current_vertex, c));
+                next = _trie.size() - 1;
+            }
+            current_vertex = next;
+        }
+        _trie[current_vertex]->id_pattern.push_back(strIndex);
+    }
+
+    int GetSuffLink(int vertex) {
+        if (_trie[vertex]->suff_link == -1) {
+            if (vertex == 0 || _trie[vertex]->father == 0) {
+                _trie[vertex]->suff_link = 0;
+            }
+            else {
+                _trie[vertex]->suff_link =
+                        GetAutoMove(GetSuffLink(_trie[vertex]->father), _trie[vertex]->symb);
+            }
+        }
+        return _trie[vertex]->suff_link;
+    }
+
+    int GetAutoMove(int vertex, char ch) {
+        auto &current_move_vertex = _trie[vertex]->auto_move[ch];
+        if (current_move_vertex == 0) {
+            if (_trie[vertex]->next_vertx[ch])
+                current_move_vertex = _trie[vertex]->next_vertx[ch];
+            else {
+                if (vertex == 0) {
+                    current_move_vertex = 0;
+                } else {
+                    current_move_vertex = GetAutoMove(GetSuffLink(vertex), ch);
+                }
+            }
+        }
+        return current_move_vertex;
+    }
+
+    int GetGoodSuffixLink(int vertex) {
+        int& link = _trie[vertex]->good_suff_link;
+        if (link == -1) {
+            int current_vertex = GetSuffLink(vertex);
+            if (current_vertex == 0) {
+                link = 0;
+            } else {
+                link = (_trie[current_vertex]->id_pattern.size() ? current_vertex : GetGoodSuffixLink(current_vertex));
+            }
+        }
+        return link;
+    }
+
+    void Check(int vertex, int i, vector<unsigned short>& cout_of_patterns) {
+        if (_trie[vertex]->flag) { //если вершина терминальная (изначально все вершины не помечены терминальными)
+            for (size_t j = 0; j < _trie[vertex]->terminals.size(); ++j) { // пробегаемся по всем подшаблонам, которым соответствует вершина
+                if (_trie[vertex]->terminals[j] < _position.size()) {
+                    //текуший индекс в тексте - размер соотв. паттерна - позиция паттерна в шаблоне
+                    int begin_index = (i - _patterns[_trie[vertex]->terminals[j]].size()) - _position[_trie[vertex]->terminals[j]];
+                    if (begin_index >= 0) {
+                        cout_of_patterns[begin_index]++;
+                    }
+                }
+            }
+        }
+        else { // если вершина не терминальная
+            _trie[vertex]->flag = true; //помечаем ее как терминальную
+            for (size_t current_vertex = vertex; current_vertex != 0; current_vertex = GetGoodSuffixLink(current_vertex)) {
+                if (_trie[current_vertex]->id_pattern.size() != 0) { //если вершине соотв. хотя бы 1 подшаблон
+                    for (auto j : _trie[current_vertex]->id_pattern) {//пробегаемся по подшаблонам
+                        _trie[vertex]->terminals.push_back(j);
+                        int begin_index = (i - _patterns[j].size()) - _position[j];
+                        if (begin_index >= 0) {
+                            cout_of_patterns[begin_index]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
+
+
+
+int main(){
+    string pattern, text;
+    cin >> pattern >> text;
+    size_t text_size = text.size();
+    Trie trie(pattern);
+
+    vector<unsigned short> cout_of_patterns(text.size(), 0); //вектор для подсчёта кол-ва вхождений каждого подшаблона в текст
+    trie.Search(text, cout_of_patterns);
+
+    if (pattern.size() > text_size) {
+        return {};
+    }
+
+    for (size_t i = 0; i < text_size - pattern.size() + 1; i++) {
+        if (cout_of_patterns[i] == trie.GetCountPattern()) {
+            cout << i << " ";
+        }
+    }
+    return 0;
+}
